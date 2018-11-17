@@ -1,8 +1,11 @@
 package com.example.rkjc.news_app_2;
 
 
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
@@ -21,6 +24,7 @@ import android.widget.TextView;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<String>{
     private static final String TAG = "MainActivity";
@@ -35,13 +39,23 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private NewsRecyclerViewAdapter mAdapter;
     private ArrayList<NewsItem> newsItems = new ArrayList<>();
 
-
+    private NewsItemViewModel mNewsItemViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         onCreateLoader(0 , savedInstanceState);
+
+        mNewsItemViewModel = ViewModelProviders.of(this).get(NewsItemViewModel.class);
+
+        mNewsItemViewModel.getAllNewsItems().observe(this, new Observer<List<NewsItem>>() {
+            @Override
+            public void onChanged(@Nullable final List<NewsItem> newsItems) {
+                // Update the cached copy of the words in the adapter.
+                mAdapter.setNewsItems((ArrayList<NewsItem>) newsItems);
+            }
+        });
 
         mRecyclerView = (RecyclerView) findViewById(R.id.news_recyclerview);
         mAdapter = new NewsRecyclerViewAdapter(this, newsItems);

@@ -23,6 +23,10 @@ public class NewsRecyclerViewAdapter extends RecyclerView.Adapter<NewsRecyclerVi
         this.mNewsItems = newsItems;
     }
 
+    public void setNewsItems(ArrayList<NewsItem> mNewsItems) {
+        this.mNewsItems = mNewsItems;
+    }
+
     @Override
     public NewsRecyclerViewAdapter.NewsViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         Context context = parent.getContext();
