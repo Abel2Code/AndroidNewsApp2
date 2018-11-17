@@ -19,5 +19,5 @@ public class NewsItemViewModel extends AndroidViewModel {
 
     LiveData<List<NewsItem>> getAllNewsItems() { return mAllNewsItem; }
 
-    public void insert(NewsItem newsItem) { mRepository.insert(newsItem); }
+    public void insert(List<NewsItem> newsItems) { mRepository.insert(newsItems); }
 }

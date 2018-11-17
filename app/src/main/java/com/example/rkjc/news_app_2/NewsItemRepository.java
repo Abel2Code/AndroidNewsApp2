@@ -3,6 +3,7 @@ package com.example.rkjc.news_app_2;
 import android.app.Application;
 import android.arch.lifecycle.LiveData;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import java.util.Arrays;
 import java.util.List;
@@ -21,11 +22,11 @@ public class NewsItemRepository {
         return mAllNewsItems;
     }
 
-    public void insert (NewsItem newsItem) {
-        new insertAsyncTask(mNewsItemDao).execute(newsItem);
+    public void insert (List<NewsItem> newsItems) {
+        new insertAsyncTask(mNewsItemDao).execute(newsItems);
     }
 
-    private static class insertAsyncTask extends AsyncTask<NewsItem, Void, Void> {
+    private static class insertAsyncTask extends AsyncTask<List<NewsItem>, Void, Void> {
 
         private NewsItemDao mAsyncTaskDao;
 
@@ -34,8 +35,8 @@ public class NewsItemRepository {
         }
 
         @Override
-        protected Void doInBackground(NewsItem... newsItems) {
-            List<NewsItem> items = Arrays.asList(newsItems);
+        protected Void doInBackground(List<NewsItem>... newsItems) {
+            List<NewsItem> items = newsItems[0];
             mAsyncTaskDao.insert(items);
             return null;
         }

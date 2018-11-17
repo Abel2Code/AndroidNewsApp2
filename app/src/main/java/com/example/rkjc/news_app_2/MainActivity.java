@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private NewsRecyclerViewAdapter mAdapter;
     private ArrayList<NewsItem> newsItems = new ArrayList<>();
 
-    private NewsItemViewModel mNewsItemViewModel;
+    protected static NewsItemViewModel mNewsItemViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,20 +47,21 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         setContentView(R.layout.activity_main);
         onCreateLoader(0 , savedInstanceState);
 
-        mNewsItemViewModel = ViewModelProviders.of(this).get(NewsItemViewModel.class);
-
-        mNewsItemViewModel.getAllNewsItems().observe(this, new Observer<List<NewsItem>>() {
-            @Override
-            public void onChanged(@Nullable final List<NewsItem> newsItems) {
-                // Update the cached copy of the words in the adapter.
-                mAdapter.setNewsItems((ArrayList<NewsItem>) newsItems);
-            }
-        });
 
         mRecyclerView = (RecyclerView) findViewById(R.id.news_recyclerview);
         mAdapter = new NewsRecyclerViewAdapter(this, newsItems);
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        mNewsItemViewModel = ViewModelProviders.of(this).get(NewsItemViewModel.class);
+        mNewsItemViewModel.getAllNewsItems().observe(this, new Observer<List<NewsItem>>() {
+            @Override
+            public void onChanged(@Nullable final List<NewsItem> newsItems) {
+                // Update the cached copy of the words in the adapter.
+                mAdapter.setNewsItems((ArrayList<NewsItem>) newsItems);
+                mAdapter.notifyDataSetChanged();
+            }
+        });
 
         mToolbar = (Toolbar) findViewById(R.id.my_toolbar);
         mProgressBar = (ProgressBar) findViewById(R.id.progress);
@@ -164,15 +165,17 @@ class NewsQueryTask extends AsyncTaskLoader<String> {
     @Override
     public String loadInBackground() {
         Log.d(TAG, "loadInBackground called");
-
+        String output = "";
         try {
             Log.d(TAG, "begin network call");
-            MainActivity.newsSearchResults = NetworkUtils.getResponseFromHttpUrl(NetworkUtils.buildUrl());
+            output = NetworkUtils.getResponseFromHttpUrl(NetworkUtils.buildUrl());
+            MainActivity.mNewsItemViewModel.insert(JsonUtils.parseNews(output));
+
         } catch (IOException e) {
             e.printStackTrace();
         }
-        Log.d(TAG, MainActivity.newsSearchResults);
-        return MainActivity.newsSearchResults;
+        Log.d(TAG, output);
+        return output;
     }
 }
 
