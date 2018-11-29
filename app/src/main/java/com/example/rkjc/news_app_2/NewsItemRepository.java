@@ -26,6 +26,10 @@ public class NewsItemRepository {
         new insertAsyncTask(mNewsItemDao).execute(newsItems);
     }
 
+    public void clear () {
+//        new clearAsyncTask(mNewsItemDao).execute();
+    }
+
     private static class insertAsyncTask extends AsyncTask<List<NewsItem>, Void, Void> {
 
         private NewsItemDao mAsyncTaskDao;
@@ -41,6 +45,22 @@ public class NewsItemRepository {
             return null;
         }
     }
+
+//    private static class clearAsyncTask extends AsyncTask<NewsItemDao, Void, Void> {
+//
+//        private NewsItemDao mAsyncTaskDao;
+//
+//        clearAsyncTask(NewsItemDao dao) {
+//            mAsyncTaskDao = dao;
+//        }
+//
+//        @Override
+//        protected Void doInBackground(NewsItemDao... dao) {
+//            dao[0].deleteAll();
+//            new insertAsyncTask(dao[0]).execute();
+//            return null;
+//        }
+//    }
 
 
 }

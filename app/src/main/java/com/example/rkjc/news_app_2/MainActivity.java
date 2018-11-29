@@ -21,6 +21,8 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.example.rkjc.news_app_2.sync.NewsSyncUtils;
+
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -39,7 +41,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private NewsRecyclerViewAdapter mAdapter;
     private ArrayList<NewsItem> newsItems = new ArrayList<>();
 
-    protected static NewsItemViewModel mNewsItemViewModel;
+    public static NewsItemViewModel mNewsItemViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +71,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         setSupportActionBar(mToolbar);
 
         mTextView = (TextView) findViewById(R.id.queryJSON);
+        NewsSyncUtils.initialize(this);
     }
 
     @Override
@@ -169,6 +172,7 @@ class NewsQueryTask extends AsyncTaskLoader<String> {
         try {
             Log.d(TAG, "begin network call");
             output = NetworkUtils.getResponseFromHttpUrl(NetworkUtils.buildUrl());
+            MainActivity.mNewsItemViewModel.clear();
             MainActivity.mNewsItemViewModel.insert(JsonUtils.parseNews(output));
 
         } catch (IOException e) {
@@ -177,5 +181,6 @@ class NewsQueryTask extends AsyncTaskLoader<String> {
         Log.d(TAG, output);
         return output;
     }
+
 }
 
