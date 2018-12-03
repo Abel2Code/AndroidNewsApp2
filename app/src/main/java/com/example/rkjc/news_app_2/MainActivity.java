@@ -3,18 +3,12 @@ package com.example.rkjc.news_app_2;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
-import android.content.Context;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.AsyncTaskLoader;
-import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -23,12 +17,11 @@ import android.widget.TextView;
 
 import com.example.rkjc.news_app_2.sync.NewsSyncUtils;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<String>{
+public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     protected static String newsSearchResults;
     private static final int LOADER_ID = 1;
@@ -47,7 +40,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        onCreateLoader(0 , savedInstanceState);
 
 
         mRecyclerView = (RecyclerView) findViewById(R.id.news_recyclerview);
@@ -97,14 +89,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_search) {
             Bundle bundle = new Bundle();
-            LoaderManager loaderManager = getSupportLoaderManager();
-            Loader<String> newsSearchLoader = loaderManager.getLoader(LOADER_ID);
-            if(newsSearchLoader == null){
-                loaderManager.initLoader(LOADER_ID, bundle, this).forceLoad();
-            }else{
-                loaderManager.restartLoader(LOADER_ID, bundle, this).forceLoad();
-            }
-
+            mNewsItemViewModel.sync();
             return true;
         }
 
@@ -125,62 +110,5 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         mAdapter.notifyDataSetChanged();
 
     }
-    @Override
-    public android.support.v4.content.Loader<String> onCreateLoader(int id, final Bundle args) {
-        return new NewsQueryTask(this, args);
-    }
-
-    @Override
-    public void onLoadFinished(android.support.v4.content.Loader<String> loader, String data) {
-        Log.d("mycode", data);
-        mProgressBar.setVisibility(View.GONE);
-        populateWithNewsData(data);
-        populateRecyclerView(data);
-    }
-
-    @Override
-    public void onLoaderReset(android.support.v4.content.Loader<String> loader) {}
-}
-
-class NewsQueryTask extends AsyncTaskLoader<String> {
-    Bundle args;
-    Context context;
-    private static final String TAG = "NewsQueryTask";
-
-    public NewsQueryTask(@NonNull Context context, Bundle args) {
-        super(context);
-        this.context = context;
-        this.args = args;
-    }
-
-    @Override
-    protected void onStartLoading() {
-        Log.d(TAG, "onStartLoading called");
-        super.onStartLoading();
-        if(args == null){
-            Log.d(TAG, "bundle null");
-            return;
-        }
-        MainActivity.mTextView.setText(R.string.waiting_for_search);
-        MainActivity.mProgressBar.setVisibility(View.VISIBLE);
-    }
-
-    @Override
-    public String loadInBackground() {
-        Log.d(TAG, "loadInBackground called");
-        String output = "";
-        try {
-            Log.d(TAG, "begin network call");
-            output = NetworkUtils.getResponseFromHttpUrl(NetworkUtils.buildUrl());
-            MainActivity.mNewsItemViewModel.clear();
-            MainActivity.mNewsItemViewModel.insert(JsonUtils.parseNews(output));
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        Log.d(TAG, output);
-        return output;
-    }
-
 }
 

@@ -1,14 +1,12 @@
 package com.example.rkjc.news_app_2.sync;
 
-import android.content.ContentResolver;
-import android.content.ContentValues;
 import android.content.Context;
 import android.util.Log;
 
 
-import com.example.rkjc.news_app_2.JsonUtils;
 import com.example.rkjc.news_app_2.MainActivity;
 import com.example.rkjc.news_app_2.NetworkUtils;
+import com.example.rkjc.news_app_2.NewsItemRepository;
 
 import java.net.URL;
 
@@ -29,8 +27,7 @@ public class NewsSyncTask {
         try {
             URL url = NetworkUtils.buildUrl();
             String output = NetworkUtils.getResponseFromHttpUrl(url);
-            MainActivity.mNewsItemViewModel.clear();
-            MainActivity.mNewsItemViewModel.insert(JsonUtils.parseNews(output));
+            NewsItemRepository.syncDB();
         } catch (Exception e) {
             /* Server probably invalid */
             e.printStackTrace();

@@ -19,7 +19,7 @@ public class NetworkUtils {
     final static String PARAM_QUERY_SORTBY = "latest";
 
     final static String PARAM_APIKEY = "apiKey";
-    final static String PARAM_QUERY_APIKEY = "4465ae30f2a94ca884f91531eded2ecd";
+    final static String PARAM_QUERY_APIKEY = Secret.key;
 
     public static URL buildUrl() {
         Uri builtUri = Uri.parse(NEWS_BASE_URL).buildUpon()
